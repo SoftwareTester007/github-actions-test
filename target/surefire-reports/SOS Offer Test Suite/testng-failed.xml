@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Failed suite [SOS Offer Test Suite]" guice-stage="DEVELOPMENT" verbose="0">
+  <test thread-count="5" name="SOS Offer 1 Test(failed)" verbose="0">
+    <parameter name="offerURL" value="https://selfdefstager.wpengine.com/offer/free-steel-river-midnight-stealth-stiletto-baton/?AFID=Codeclouds+Test+Page&amp;utm_source=TestSource&amp;utm_medium=TestMedium&amp;utm_campaign=TestCampaign"/>
+    <parameter name="browserName" value="chrome"/>
+    <classes>
+      <class name="sos.testClass.Test_Free_SteelRriver_Midnight_Stealth_Stiletto_Baton">
+        <methods>
+          <include name="selectCrossSellsProducts"/>
+          <include name="setUP"/>
+        </methods>
+      </class> <!-- sos.testClass.Test_Free_SteelRriver_Midnight_Stealth_Stiletto_Baton -->
+    </classes>
+  </test> <!-- SOS Offer 1 Test(failed) -->
+</suite> <!-- Failed suite [SOS Offer Test Suite] -->
