@@ -1,0 +1,78 @@
+name: Run One Profile and Publish Allure Report
+
+on:
+  workflow_dispatch:
+    inputs:
+      browser:
+        description: 'Choose browser'
+        required: true
+        default: 'chrome'
+        type: choice
+        options:
+          - chrome
+          - firefox
+
+      platform:
+        description: 'Choose platform'
+        required: true
+        default: 'ubuntu-latest'
+        type: choice
+        options:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+
+jobs:
+  run-and-publish:
+    name: Run profile on ${{ inputs.platform }} with ${{ inputs.browser }}
+    runs-on: ${{ inputs.platform }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Install Chrome (Ubuntu only)
+        if: ${{ inputs.browser == 'chrome' && inputs.platform == 'ubuntu-latest' }}
+        run: |
+          sudo apt update
+          sudo apt install -y wget
+          wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+          sudo apt install -y ./google-chrome-stable_current_amd64.deb
+
+      - name: Install Firefox (Ubuntu only)
+        if: ${{ inputs.browser == 'firefox' && inputs.platform == 'ubuntu-latest' }}
+        run: |
+          sudo apt update
+          sudo apt install -y firefox
+
+      - name: Set BROWSER env
+        run: echo "BROWSER=${{ inputs.browser }}" >> $GITHUB_ENV
+
+      - name: Run Profile 1
+        run: mvn clean verify -Pprofile1 -Dbrowser=${{ env.BROWSER }}
+
+      - name: Generate Allure Report
+        run: |
+          mkdir -p allure-report/profile1
+          cp -r target/allure-results allure-report/profile1/allure-results
+          allure generate allure-report/profile1/allure-results -o allure-report/profile1 --clean
+
+      - name: Publish Allure Report to Public Repo (repo1)
+        if: always()
+        run: |
+          DATE=$(date +'%Y-%m-%d_%H-%M')
+          git config --global user.name 'github-actions'
+          git config --global user.email 'github-actions@github.com'
+          git clone -b allure-reports https://x-access-token:${{ secrets.REPORT_PUBLISH_TOKEN }}@github.com/SoftwareTester007/github-actions-test.git publish-repo
+          cd publish-repo
+          mkdir -p $DATE
+          cp -r ../allure-reports/* $DATE/
+          git add .
+          git commit -m "Allure report for $DATE"
+          git push
