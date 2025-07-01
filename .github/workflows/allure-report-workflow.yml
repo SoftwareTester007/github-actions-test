@@ -55,7 +55,7 @@ jobs:
         run: echo "BROWSER=${{ inputs.browser }}" >> $GITHUB_ENV
 
       - name: Run Profile 1
-        run: mvn clean verify -PSOS-OFFER-1 -Dbrowser=${{ env.BROWSER }}
+        run: mvn clean verify -PSOS_OFFER_1 -Dbrowser=${{ env.BROWSER }}
 
       - name: Generate Allure Report
         run: |
